@@ -1,5 +1,3 @@
-"""Generate plots from benchmark results."""
-
 import os
 import csv
 import matplotlib.pyplot as plt
@@ -10,7 +8,6 @@ PLOTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "plots")
 
 
 def load_csv(filename):
-    """Load CSV results into a list of dicts with float values."""
     filepath = os.path.join(RESULTS_DIR, filename)
     with open(filepath, "r") as f:
         reader = csv.DictReader(f)
@@ -21,7 +18,6 @@ def load_csv(filename):
 
 
 def plot_aes(aes_data):
-    """Plot AES encryption and decryption times."""
     sizes = [d["size"] for d in aes_data]
     enc_means = [d["enc_mean"] for d in aes_data]
     enc_cis = [d["enc_ci"] for d in aes_data]
@@ -51,14 +47,12 @@ def plot_aes(aes_data):
 
 
 def plot_rsa(rsa_data):
-    """Plot RSA encryption and decryption times separately."""
     sizes = [d["size"] for d in rsa_data]
     enc_means = [d["enc_mean"] for d in rsa_data]
     enc_cis = [d["enc_ci"] for d in rsa_data]
     dec_means = [d["dec_mean"] for d in rsa_data]
     dec_cis = [d["dec_ci"] for d in rsa_data]
 
-    # RSA Encryption
     fig, ax = plt.subplots(figsize=(10, 6))
     x = np.arange(len(sizes))
     ax.bar(x, enc_means, yerr=enc_cis, capsize=5, color="#4CAF50", alpha=0.8)
@@ -73,7 +67,6 @@ def plot_rsa(rsa_data):
     plt.close()
     print("  Saved rsa_enc_times.png")
 
-    # RSA Decryption
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(x, dec_means, yerr=dec_cis, capsize=5, color="#F44336", alpha=0.8)
     ax.set_xlabel("File Size (bytes)")
@@ -89,7 +82,6 @@ def plot_rsa(rsa_data):
 
 
 def plot_sha(sha_data):
-    """Plot SHA-256 hash generation times."""
     sizes = [d["size"] for d in sha_data]
     means = [d["mean"] for d in sha_data]
     cis = [d["ci"] for d in sha_data]
@@ -110,15 +102,18 @@ def plot_sha(sha_data):
 
 
 def plot_comparison(aes_data, rsa_data, sha_data):
-    """Plot combined comparison charts."""
     sizes = [d["size"] for d in aes_data]
     x = np.arange(len(sizes))
+    width = 0.35
+
+    aes_enc = [d["enc_mean"] for d in aes_data]
+    rsa_enc = [d["enc_mean"] for d in rsa_data]
+    rsa_dec = [d["dec_mean"] for d in rsa_data]
+    sha_means = [d["mean"] for d in sha_data]
+    aes_dec = [d["dec_mean"] for d in aes_data]
 
     # AES vs RSA encryption
     fig, ax = plt.subplots(figsize=(10, 6))
-    width = 0.35
-    aes_enc = [d["enc_mean"] for d in aes_data]
-    rsa_enc = [d["enc_mean"] for d in rsa_data]
     ax.bar(x - width / 2, aes_enc, width, label="AES-CTR Encryption",
            color="#2196F3", alpha=0.8)
     ax.bar(x + width / 2, rsa_enc, width, label="RSA-based Encryption",
@@ -136,9 +131,8 @@ def plot_comparison(aes_data, rsa_data, sha_data):
     plt.close()
     print("  Saved comparison_aes_vs_rsa.png")
 
-    # AES encryption vs SHA
+    # AES vs SHA
     fig, ax = plt.subplots(figsize=(10, 6))
-    sha_means = [d["mean"] for d in sha_data]
     ax.bar(x - width / 2, aes_enc, width, label="AES-CTR Encryption",
            color="#2196F3", alpha=0.8)
     ax.bar(x + width / 2, sha_means, width, label="SHA-256 Digest",
@@ -155,9 +149,8 @@ def plot_comparison(aes_data, rsa_data, sha_data):
     plt.close()
     print("  Saved comparison_aes_vs_sha.png")
 
-    # RSA encryption vs decryption
+    # RSA enc vs dec
     fig, ax = plt.subplots(figsize=(10, 6))
-    rsa_dec = [d["dec_mean"] for d in rsa_data]
     ax.bar(x - width / 2, rsa_enc, width, label="RSA Encryption",
            color="#4CAF50", alpha=0.8)
     ax.bar(x + width / 2, rsa_dec, width, label="RSA Decryption",
@@ -174,14 +167,13 @@ def plot_comparison(aes_data, rsa_data, sha_data):
     plt.close()
     print("  Saved comparison_rsa_enc_vs_dec.png")
 
-    # All operations combined (log scale)
+    # All combined (log scale)
     fig, ax = plt.subplots(figsize=(12, 7))
-    width = 0.2
-    aes_dec = [d["dec_mean"] for d in aes_data]
-    ax.bar(x - 1.5 * width, aes_enc, width, label="AES-CTR Enc", color="#2196F3", alpha=0.8)
-    ax.bar(x - 0.5 * width, aes_dec, width, label="AES-CTR Dec", color="#FF9800", alpha=0.8)
-    ax.bar(x + 0.5 * width, rsa_enc, width, label="RSA Enc", color="#4CAF50", alpha=0.8)
-    ax.bar(x + 1.5 * width, sha_means, width, label="SHA-256", color="#9C27B0", alpha=0.8)
+    w = 0.15
+    ax.bar(x - 1.5 * w, aes_enc, w, label="AES-CTR Enc", color="#2196F3", alpha=0.8)
+    ax.bar(x - 0.5 * w, aes_dec, w, label="AES-CTR Dec", color="#FF9800", alpha=0.8)
+    ax.bar(x + 0.5 * w, rsa_enc, w, label="RSA Enc", color="#4CAF50", alpha=0.8)
+    ax.bar(x + 1.5 * w, sha_means, w, label="SHA-256", color="#9C27B0", alpha=0.8)
     ax.set_xlabel("File Size (bytes)")
     ax.set_ylabel("Time (μs) — log scale")
     ax.set_title("All Cryptographic Operations — Performance Comparison")
