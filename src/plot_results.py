@@ -174,6 +174,7 @@ def plot_comparison(aes_data, rsa_data, sha_data):
     ax.bar(x - 0.5 * w, aes_dec, w, label="AES-CTR Dec", color="#FF9800", alpha=0.8)
     ax.bar(x + 0.5 * w, rsa_enc, w, label="RSA Enc", color="#4CAF50", alpha=0.8)
     ax.bar(x + 1.5 * w, sha_means, w, label="SHA-256", color="#9C27B0", alpha=0.8)
+    ax.bar(x + 2.5 * w, rsa_dec, w, label="RSA Dec", color="#F44336", alpha=0.8)
     ax.set_xlabel("File Size (bytes)")
     ax.set_ylabel("Time (μs) — log scale")
     ax.set_title("All Cryptographic Operations — Performance Comparison")
