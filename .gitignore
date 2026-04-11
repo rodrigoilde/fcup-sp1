@@ -28,6 +28,3 @@ env/
 test_files/
 results/
 plots/
-
-# Large binary files (keep locally, don't track)
-*.pdf
