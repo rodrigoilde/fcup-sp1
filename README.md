@@ -1,6 +1,7 @@
 # Assignment #1: Performance Benchmarking of Cryptographic Mechanisms
 
 Security and Privacy — FCUP 2025/2026
+Graded 97/100
 
 ## Requirements
 
